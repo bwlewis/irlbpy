@@ -1,3 +1,9 @@
+# irlb: Truncated SVD by implicitly restarted Lanczos bidiagonalization.
+# Augmented Implicitly Restarted Lanczos Bidiagonalization Methods,
+# J. Baglama and L. Reichel, SIAM J. Sci. Comput. 2005
+#
+# Implemented for Python by Bryan Lewis, Mike Kane, and Jim Baglama.
+# XXX finish topmatter...
 import numpy as np
 import pdb
 
