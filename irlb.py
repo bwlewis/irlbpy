@@ -47,7 +47,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
     W[:,j] = W[:,j]/s
     # Lanczos process
     while(j<m_b):
-      F = np.dot(A.transpose(),W[:,j])  # XXX Omit A.transpose()
+      F = np.transpose(np.dot(W[:,j].transpose(),A))
       mprod+=1
       F = F - s*V[:,j]
       F = orthog(F,V[:,0:j+1])  # WTF is it with this indexing madness?
