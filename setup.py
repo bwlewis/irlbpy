@@ -4,8 +4,8 @@ except ImportError:
     from distutils.core import setup
 
 setup(
-    name='elr',
-    version='0.1.0dev',
+    name='irlbpy',
+    version='0.1.0',
     author='Bryan W. Lewis',
     author_email='blewis@illposed.net',
     packages=['irlb'],
