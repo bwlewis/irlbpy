@@ -14,7 +14,7 @@ Installation:
 
 There are several options for installing the irlbpy package. The easiest is 
 to simply ``pip install`` the code (either into your system site-packages or
-a `virtualenv <https://pypi.python.org/pypi/virtualenv>` with the command::
+[virtualenv](https://pypi.python.org/pypi/virtualenv) with the command:
 
 ```
 pip install -e git+https://github.com/bwlewis/irlbpy.git#egg=irlb
