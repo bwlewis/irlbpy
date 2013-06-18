@@ -25,7 +25,7 @@ locally by executing the following commands from the project's home directory:
 
 ```
 python setup.py sdist
-pip install dist/irlbpy-0.1.0.tar.gz 
+pip install dist/irlbpy-0.1.0.tar.gz
 ```
 
 Usage:
