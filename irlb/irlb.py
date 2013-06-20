@@ -7,8 +7,8 @@ def orthog(Y,X):
   This function requires that the column dimension of Y is less than X and
   that Y and X have the same number of rows.
   """
-  dotY = np.dot(Y.transpose(),X).transpose()
-  return (Y - np.dot(X,dotY))
+  dotY = (Y.transpose().dot(X)).transpose()
+  return (Y - X.dot(dotY))
 
 # Simple utility function used to check linear dependencies during computation:
 def invcheck(x):
@@ -42,7 +42,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
   X[4] The number of matrix-vector products run.
 
   The algorithm estimates the truncated singular value decomposition:
-  np.dot(A, X[2]) = X[0]*X[1].
+  A.dot(X[2]) = X[0]*X[1].
   """
   nu    = n
   m     = np.shape(A)[0]
@@ -66,20 +66,19 @@ def irlb(A,n,tol=0.0001,maxit=50):
 
   while(it < maxit):
     if(it>0): j=k
-    W[:,j] = np.dot(A,V[:,j]) # W[,j] = A%*%V[,j]
+    W[:,j] = A.dot(V[:,j])
     mprod+=1
     if(it>0):
-      W[:,j] = orthog(W[:,j],W[:,0:j])
-      # W[:,0:j] selects columns 0,1,...,j-1 apparently?? Arrgh.
+      W[:,j] = orthog(W[:,j],W[:,0:j]) # NB W[:,0:j] selects columns 0,1,...,j-1
     s = np.linalg.norm(W[:,j])
     sinv = invcheck(s)
     W[:,j] = sinv*W[:,j]
     # Lanczos process
     while(j<m_b):
-      F = np.transpose(np.dot(W[:,j].transpose(),A))
+      F = np.transpose(W[:,j].transpose().dot(A))
       mprod+=1
       F = F - s*V[:,j]
-      F = orthog(F,V[:,0:j+1])  # WTF is it with this indexing madness?
+      F = orthog(F,V[:,0:j+1])
       fn = np.linalg.norm(F)
       fninv= invcheck(fn)
       F  = fninv * F
@@ -89,9 +88,9 @@ def irlb(A,n,tol=0.0001,maxit=50):
         B[j,j+1] = fn 
         W[:,j+1] = np.dot(A,V[:,j+1])
         mprod+=1
-        # One step of classical Gram-Schmidt
+        # One step of classical Gram-Schmidt...
         W[:,j+1] = W[:,j+1] - fn*W[:,j]
-        # Full reorthogonalization
+        # ...with full reorthogonalization
         W[:,j+1] = orthog(W[:,j+1],W[:,0:(j+1)])
         s = np.linalg.norm(W[:,j+1])
         sinv = invcheck(s) 
@@ -108,26 +107,23 @@ def irlb(A,n,tol=0.0001,maxit=50):
       smax = max((S[1][0],smax))
 
     conv = sum(np.abs(R[0:nu]) < tol*smax)
-#    print("iter=%d conv=%d" % (it,conv))
-#    pdb.set_trace()  # browser--uncomment to drop to debug shell
-    if(conv < nu):  # Not coverged yet XXX
+    if(conv < nu):  # Not coverged yet
       k = max(conv+nu,k)
       k = min(k,m_b-3)
     else:
       break
-    # Use Ritz vectors
+    # Update the Ritz vectors
     V[:,0:k] = np.dot(V[:,0:m_b],S[2].transpose()[:,0:k])
     V[:,k] = F 
     B = np.zeros((m_b,m_b))
-    # This sucks, must be better way to assign diagonal.
+    # Improve this! There must be better way to assign diagonal...
     for l in xrange(0,k):
       B[l,l] = S[1][l]
     B[0:k,k] = R[0:k]
     # Update the left approximate singular vectors
-    W[:,0:k] = np.dot(W[:,0:m_b], S[0][:,0:k])
+    W[:,0:k] = W[:,0:m_b].dot(S[0][:,0:k])
     it+=1
 
-  U = np.dot(W[:,0:m_b], S[0][:,0:nu])
-  V = np.dot(V[:,0:m_b], S[2].transpose()[:,0:nu])
+  U = W[:,0:m_b].dot(S[0][:,0:nu])
+  V = V[:,0:m_b].dot(S[2].transpose()[:,0:nu])
   return((U,S[1][0:nu],V,it,mprod))
-

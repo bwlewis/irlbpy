@@ -45,4 +45,4 @@ iterations.
 
 The returned triple S contains the matrix of left singular vectors, a
 vector of singular values, and the matrix of right singular vectors,
-respectively, such that: ``np.dot(A, S[2]) - S[0]*S[1]`` is small.
+respectively, such that: ``A.dot(S[2]) - S[0]*S[1]`` is small.
