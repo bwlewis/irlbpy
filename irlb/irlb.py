@@ -1,14 +1,30 @@
 import numpy as np
-import pdb
+import scipy.sparse as sp
 import warnings
+import pdb
+
+# Matrix-vector product wrapper
+# A is a numpy 2d array or matrix, or a scipy matrix or sparse matrix.
+# x is a numpy vector only.
+# Compute A.dot(x) if t is False,
+#         A.transpose().dot(x)  otherwise.
+def mult(A,x,t=False):
+  # XXX Add check for x here and coerce to np 1d array
+  if(sp.issparse(A)):
+    if(t):
+      return(sp.csr_matrix(x).dot(A).transpose().todense().A[:,0])
+    return(A.dot(sp.csr_matrix(x).transpose()).todense().A[:,0])
+  if(t):
+    return(x.dot(A).transpose())
+  return(A.dot(x))
 
 def orthog(Y,X):
   """Orthogonalize a vector or matrix Y against the columns of the matrix X.
   This function requires that the column dimension of Y is less than X and
   that Y and X have the same number of rows.
   """
-  dotY = (Y.transpose().dot(X)).transpose()
-  return (Y - X.dot(dotY))
+  dotY = mult(X,Y,t=True)
+  return (Y - mult(X,dotY))
 
 # Simple utility function used to check linear dependencies during computation:
 def invcheck(x):
@@ -44,21 +60,22 @@ def irlb(A,n,tol=0.0001,maxit=50):
   The algorithm estimates the truncated singular value decomposition:
   A.dot(X[2]) = X[0]*X[1].
   """
-  nu    = n
-  m     = np.shape(A)[0]
-  n     = np.shape(A)[1]
+  nu     = n
+  m      = A.shape[0]
+  n      = A.shape[1]
   if(min(m,n)<2):
     raise Exception("The input matrix must be at least 2x2.")
-  m_b   = min((nu+4, 3*nu, n))  # Working dimension size
-  mprod = 0
-  it    = 0
-  j     = 0
-  k     = nu
-  smax  = 1
+  m_b    = min((nu+4, 3*nu, n))  # Working dimension size
+  mprod  = 0
+  it     = 0
+  j      = 0
+  k      = nu
+  smax   = 1
+  sparse = sp.issparse(A)
 
   V  = np.zeros((n,m_b))
   W  = np.zeros((m,m_b))
-  F  = np.zeros(n)
+  F  = np.zeros((n,1))
   B  = np.zeros((m_b,m_b))
 
   V[:,0]  = np.random.randn(n) # Initial vector
@@ -66,7 +83,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
 
   while(it < maxit):
     if(it>0): j=k
-    W[:,j] = A.dot(V[:,j])
+    W[:,j] = mult(A,V[:,j])
     mprod+=1
     if(it>0):
       W[:,j] = orthog(W[:,j],W[:,0:j]) # NB W[:,0:j] selects columns 0,1,...,j-1
@@ -75,7 +92,9 @@ def irlb(A,n,tol=0.0001,maxit=50):
     W[:,j] = sinv*W[:,j]
     # Lanczos process
     while(j<m_b):
-      F = np.transpose(W[:,j].transpose().dot(A))
+      F = mult(A,W[:,j],t=True)
+# XXX
+#      pdb.set_trace()
       mprod+=1
       F = F - s*V[:,j]
       F = orthog(F,V[:,0:j+1])
@@ -86,7 +105,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
         V[:,j+1] = F
         B[j,j] = s
         B[j,j+1] = fn 
-        W[:,j+1] = np.dot(A,V[:,j+1])
+        W[:,j+1] = mult(A,V[:,j+1])
         mprod+=1
         # One step of classical Gram-Schmidt...
         W[:,j+1] = W[:,j+1] - fn*W[:,j]
@@ -113,7 +132,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
     else:
       break
     # Update the Ritz vectors
-    V[:,0:k] = np.dot(V[:,0:m_b],S[2].transpose()[:,0:k])
+    V[:,0:k] = V[:,0:m_b].dot(S[2].transpose()[:,0:k])
     V[:,k] = F 
     B = np.zeros((m_b,m_b))
     # Improve this! There must be better way to assign diagonal...
