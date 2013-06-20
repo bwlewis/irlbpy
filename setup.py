@@ -15,5 +15,10 @@ setup(
                 'bidiagonalization',
     long_description=open('README.rst').read(),
     install_requires=["numpy"],
+    entry_points={
+      'console_scripts':[
+        'scipy_bench=irlb.scipy_bench:main'
+      ],
+    },
 )
 
