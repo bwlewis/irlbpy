@@ -1,0 +1,5 @@
+latex scipy2013.tex
+dvips scipy2013.dvi
+ps2pdf scipy2013.ps
+rm scipy2013.dvi
+rm scipy2013.ps
