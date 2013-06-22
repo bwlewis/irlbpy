@@ -84,7 +84,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
 
   while(it < maxit):
     if(it>0): j=k
-    W[:,j] = mult(A,V[xrange(0,n),j])
+    W[:,j] = mult(A,V[:,j])
     mprod+=1
     if(it>0):
       W[:,j] = orthog(W[:,j],W[:,0:j]) # NB W[:,0:j] selects columns 0,1,...,j-1
@@ -93,7 +93,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
     W[:,j] = sinv*W[:,j]
     # Lanczos process
     while(j<m_b):
-      F = mult(A,W[xrange(0,m),j],t=True)
+      F = mult(A,W[:,j],t=True)
       mprod+=1
       F = F - s*V[:,j]
       F = orthog(F,V[:,0:j+1])
@@ -104,7 +104,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
         V[:,j+1] = F
         B[j,j] = s
         B[j,j+1] = fn 
-        W[:,j+1] = mult(A,V[xrange(0,n),j+1])
+        W[:,j+1] = mult(A,V[:,j+1])
         mprod+=1
         # One step of classical Gram-Schmidt...
         W[:,j+1] = W[:,j+1] - fn*W[:,j]
