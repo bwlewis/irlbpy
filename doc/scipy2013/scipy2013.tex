@@ -202,7 +202,7 @@ and benchmarks performance.  The benchmarks were performed on a Mac Book Pro
 with a quad-core 2.7 GHz Intel Core i7 with 16 GB of 1600 MHz DDR3 RAM running
 Python version 2.7.3, Numpy version 1.7.0, and SciPy version 0.12.0.
 
-\columnbreak
+%\columnbreak
 
 %%% Introduction
 \vspace{2cm}\begin{center}\pbox{0.8\columnwidth}{}{linewidth=2mm,framearc=0.1,fillstyle=gradient,gradangle=0,gradbegin=white,gradend=white,gradmidpoint=1.0,framesep=1em}{\begin{center}\bf{Partial SVD Definition}\end{center}}\end{center}\vspace{1.25cm}
@@ -242,34 +242,40 @@ allows users to make very quick estimates of a few singular values and
 their corresponding vectors, even for large problems.
 
 
-\columnbreak
+%\columnbreak
 
 %%% Section
-\vspace{2cm}\begin{center}\pbox{0.8\columnwidth}{}{linewidth=2mm,framearc=0.1,fillstyle=gradient,gradangle=0,gradbegin=white,gradend=white,gradmidpoint=1.0,framesep=1em}{\begin{center}\bf{Discussion}\end{center}}\end{center}\vspace{1.25cm}
+\vspace{1cm}\begin{center}\pbox{0.8\columnwidth}{}{linewidth=2mm,framearc=0.1,fillstyle=gradient,gradangle=0,gradbegin=white,gradend=white,gradmidpoint=1.0,framesep=1em}{\begin{center}\bf{Discussion}\end{center}}\end{center}\vspace{1.25cm}
 
-\begin{enumerate}
-\item In practice the IRLB algorithm scales linearly in the size of the data.
+In practice the IRLB algorithm scales linearly in the size of the data.
 This gives it a tremendous advantage over the traditional SVD methods when only
 the largest singular value information is needed.
-\item The algorithms computational cost does increase
-as the number of singular values required increases.
-\item The IRLB algorithm and irlbpy implementation are compatible with 
+
+\vspace{0.75cm}
+
+The IRLB algorithm and irlbpy implementation are compatible with 
 both dense numpy matrices and sparse scipy matrices.
-\item A distributed version of the IRLB algorithm is availablle
+
+\vspace{0.75cm}
+
+A distributed version of the IRLB algorithm is availablle
 for SciDB \cite{scidb} (and soon indirectly for Python through the
 SciDBPy package under development). This version has computed a truncated SVD
 on sparse matrices with 50 million rows, 40 million columns and
 4 billion non-zero elements on a cluster of 4 dual-Xeon machines
 in approximately five minutes per singular value/vector.
-\item The irlbpy package can compute a few singular vectors and
+
+\vspace{0.75cm}
+
+The irlbpy package can compute a few singular vectors and
 corresponding singular values of problems similar to the Netflix
 prize problem--a sparse $500000\times18000$ matrix with about $100$ million nonzero entries--in a few minutes on a laptop.
-\end{enumerate}
 
-We note that Martinsson, Rokhlin, and others have developed fast truncated
+\vspace{0.75cm}
+
+Martinsson, Rokhlin, and others have developed fast truncated
 SVD and related decomposition methods using randomized methods, see
-for example:
-Edo Liberty, Franco Woolfe, Per-Gunnar Martinsson, Vladimir Rokhlin, and Mark Tygert, Randomized algorithms for the low-rank approximation of matrices, Proceedings of the National Academy of Sciences 2007 104: 20167-20172.
+for example \cite{Liberty2007}
 These methods are indeed competetive with the IRLB approach, and problems
 exist where each outperforms the other. 
 
