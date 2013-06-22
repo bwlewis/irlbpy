@@ -161,112 +161,117 @@
 \begin{center}\pbox{0.8\columnwidth}{}{linewidth=2mm,framearc=0.1,fillstyle=gradient,gradangle=0,gradbegin=white,gradend=white,gradmidpoint=1.0,framesep=1em}{\begin{center}\bf{Overview}\end{center}}\end{center}
 \vspace{1.25cm}
 
-The singular value decomposition (SVD) is central to many important 
-data-analytic
-methods and applications including principal component analysis, canonical
-correlation analysis, correspondence analysis, latent semantic indexing and
-non-linear iterative partial least squares to name a few. However, numerical 
-implementations of the SVD are intensive, generally incurring
-a computational complexity of $O(m^2n + n^3)$ for an $m \times n$ matrix with
-$m$ greater than $n$. As a result, data scientist's have fewer analytical 
-tools to understand the structure of data as those data become large and
-the resulting computational cost becomes too expensive to carry out.
+The singular value decomposition (SVD) is central to many important
+data-analytic methods and applications including principal component analysis,
+canonical correlation analysis, correspondence analysis, latent semantic
+indexing and non-linear iterative partial least squares to name a few. However,
+numerical implementations of the SVD are intensive, generally incurring a
+computational complexity of $O(m^2n + n^3)$ for an $m \times n$ real matrix.
+As a result, data scientist's have fewer analytical tools to understand the
+structure of data as those data become large and the resulting computational
+cost becomes too expensive to carry out.
 
 \vspace{0.75cm}
 
-However, many of these methods and applications only require a few singular
-values and corresponding singular vectors. With this in mind, some 
-numerical analysts
-have focused on the developement of {\em truncated} SVD algorithms that
-calculate the largest or smallest singular values and vectors for a matrix.
-The {\em implicitly restarted Lanczos bidiagonalization} (IRLB) algorithm
-\cite{Baglama2006} is a fast and efficient approach
-for calculating truncated singular values and vectors, generally scaling 
-linearly in the size of the matrix. This innovative algorithm 
-calculates a key numerical decomposition for statistical and machine 
-learning procedures and it effectively scales to massive data.
-Standard analyses can now be applied to
-much larger data sets than previously possible.
-Furthermore, the approach used by the IRLB algorithm suggests a general class
-of new approximation algorithms that can be used for big-data challenges
-where current approaches fall short.
+Many important analysis methods and applications only require a subset of the
+largest singular values and corresponding singular vectors. With this in mind,
+some numerical analysts have focused on the developement of {\em truncated} SVD
+algorithms that calculate the largest or smallest singular values and vectors
+for a matrix.  The {\em augmented implicitly restarted Lanczos
+bidiagonalization} (IRLB) algorithm \cite{Baglama2006} is a fast and efficient
+approach for calculating truncated singular value decompositions, generally
+scaling linearly in the size of the matrix. This innovative algorithm
+calculates a key numerical decomposition for statistical and machine learning
+procedures and it effectively scales to massive data.  Standard analyses can
+now be applied to much larger data sets than previously possible.  Furthermore,
+the approach used by the IRLB algorithm suggests a general class of new
+approximation algorithms that can be used for big-data challenges where current
+approaches fall short.
 
 \vspace{0.75cm}
 
-While IRLB implementations have existed for some time now in both 
-Matlab \cite{irlbaMatlab} and R \cite{irlbaR} the scientific Python community
-has not enjoyed the computational savings offered by the algorithm until now.
-This poster introduces the irlbpy package for Python, a pip-installable 
-open-source implementation of the IRLB algorithm that is available from
-github at https://github.com/bwlewis/irlbpy. The package is compatible with
-numpy for dense matrices challenges scipy for sparse matrices. The rest
-of this poster gives an overview of the algorithm and benchmarks performance.
-The benchmarks were performed on a Mac Book Pro with a quad-core
-2.7 GHz Intel Core i7 with 16 GB of 1600 MHz DDR3 RAM running Python 
-version 2.7.3, Numpy version 1.7.0, and SciPy version 0.12.0.
+While IRLB implementations have existed for some time now in both Matlab
+\cite{irlbaMatlab} and R \cite{irlbaR} the scientific Python community has not
+enjoyed the computational savings offered by the algorithm until now.  This
+poster introduces the irlbpy package for Python, a pip-installable open-source
+implementation of the IRLB algorithm that is available from github at
+https://github.com/bwlewis/irlbpy. The package is compatible with dense and
+sparse data, accepting either numpy 2D arrays or matrices, or scipy sparse
+matrices as input. The rest of this poster gives an overview of the algorithm
+and benchmarks performance.  The benchmarks were performed on a Mac Book Pro
+with a quad-core 2.7 GHz Intel Core i7 with 16 GB of 1600 MHz DDR3 RAM running
+Python version 2.7.3, Numpy version 1.7.0, and SciPy version 0.12.0.
 
 \columnbreak
 
 %%% Introduction
 \vspace{2cm}\begin{center}\pbox{0.8\columnwidth}{}{linewidth=2mm,framearc=0.1,fillstyle=gradient,gradangle=0,gradbegin=white,gradend=white,gradmidpoint=1.0,framesep=1em}{\begin{center}\bf{Partial SVD Definition}\end{center}}\end{center}\vspace{1.25cm}
 
-The SVD of a positive, semidefinite matrix $X \in \mathcal{R}^{m \times n}$ 
-with $m \geq n$ is a factorization of the form
-\begin{equation} \label{eqn:svd_def}
-X = U \Sigma V^{T}
-\end{equation}
-where $U$ is an $m \times m$ unitary matrix, $\Sigma$ is an $m \times n$
-rectangular diagonal matrix, and $V$ is an $n \times n$ unitary matrix. 
-The diagonal values of $\Sigma$, $\sigma_1, ... \sigma_n \geq 0$ and by
-convention they are sorted in decreasing order with the corresponding 
-left-singular vectors ($u_1, ..., u_m$) and right-singular vectors, 
-($v_1, ..., v_n$) ordered similarly.
+A truncated SVD of a matrix $X \in \mathcal{R}^{m \times n}$ computes the
+decomposition
+
+\[
+XV = U\Sigma,
+\]
+
+where $V$ is an $n\times p$ orthonormal matrix,
+$U$ is an $m \times p$ orthonormal matrix, $\Sigma$ is an $p \times p$
+diagonal matrix, and $1\le p\le\min(m,n)$.
+The diagonal values of $\Sigma$ are called singular values of $X$ and
+are nonnegative and ordered,
+$\sigma_1\ge \sigma_2\ge \cdots \sigma_p \geq 0$.
+The columns of $U$ and $V$ are
+called the left and right signular vectors, repsectively.
 
 \vspace{0.75cm}
 
-Alternatively, the factorization in Equation \ref{eqn:svd_def} can be written
-as
-\begin{equation}
-X = \sum_{j=1}^n \sigma_j u_j v_j^T.
-\end{equation}
-where again $u_j$ and $v_j$ represent the $j$th column of $U$ and $V$ 
-respectively. Based on this formulation, we define the {\em partial}
-SVD as
-\begin{equation}
-X_k = \sum_{j=1}^k \sigma_j u_j v_j^T.
-\end{equation}
+When $p=\min(m,n)$, the truncated singular value decomposition coincides
+with the usual singular value decomposition and $A = U\Sigma V^T$. When
+$p<\min(m,n)$, then $U\Sigma V^T$ only approximates the matrix $A$.
 
-$X_k$ can be thought of as an approximation of the original matrix $X$. As
-$k$ increases to $n$ the approximation becomes more accurate. Alternatively,
-a singular value along with its corresponding left and right singular vectors 
-capture salient information about the matrix. The amount of ``signal'' is
-proportional to the size of the singular value.
+\vspace{0.75cm}
+The irlb algorithm estimates a truncated SVD of X, computing
+\[
+XV \approx U\Sigma
+\]
+by projecting the matrix into an augmented sequence of Krylov subspaces.
+The quality of the approximation is user-controlled by a subspace iteration
+tolerance parameter. The method often converges to a solution quickly even
+when the tolerance is set to a small value. The availability of the parameter
+allows users to make very quick estimates of a few singular values and
+their corresponding vectors, even for large problems.
+
 
 \columnbreak
 
 %%% Section
-\vspace{2cm}\begin{center}\pbox{0.8\columnwidth}{}{linewidth=2mm,framearc=0.1,fillstyle=gradient,gradangle=0,gradbegin=white,gradend=white,gradmidpoint=1.0,framesep=1em}{\begin{center}\bf{Properties of the IRLB algorithm}\end{center}}\end{center}\vspace{1.25cm}
+\vspace{2cm}\begin{center}\pbox{0.8\columnwidth}{}{linewidth=2mm,framearc=0.1,fillstyle=gradient,gradangle=0,gradbegin=white,gradend=white,gradmidpoint=1.0,framesep=1em}{\begin{center}\bf{Discussion}\end{center}}\end{center}\vspace{1.25cm}
 
 \begin{enumerate}
 \item In practice the IRLB algorithm scales linearly in the size of the data.
-This gives it a tremendous advantage over the traditional SVD when only
+This gives it a tremendous advantage over the traditional SVD methods when only
 the largest singular value information is needed.
-\item The algorithms computational cost as the number of singular values
-required increases.
+\item The algorithms computational cost does increase
+as the number of singular values required increases.
 \item The IRLB algorithm and irlbpy implementation are compatible with 
 both dense numpy matrices and sparse scipy matrices.
-\item Implementations of the IRLB algorithm have been successfully used on
-an incidence matrix based on the Netflix data set. The matrix was
-composed of approximately 500,000 rows (movies) by 18,000 columns (viewers)
-with 100 million nonzero elements. The singular values were calculated on
-a laptop computer and required only 20 minutes of computing time.
-\item A distributed version of the IRLB algorithm has been implemented 
-for SciDB \cite{scidb}. This version calculates the truncated SVD
-on matrices with approximately 50 million rows, 40 million columns and
-4 billion non-zero elements on a cluster of 4 Xeon machines (Sandy Bridge, 
-16 cores, 128 GB RAM) in approximately five minutes per singular value and
-vector.
+\item A distributed version of the IRLB algorithm is availablle
+for SciDB \cite{scidb} (and soon indirectly for Python through the
+SciDBPy package under development). This version has computed a truncated SVD
+on sparse matrices with 50 million rows, 40 million columns and
+4 billion non-zero elements on a cluster of 4 dual-Xeon machines
+in approximately five minutes per singular value/vector.
+\item The irlbpy package can compute a few singular vectors and
+corresponding singular values of problems similar to the Netflix
+prize problem--a sparse $500000\times18000$ matrix with about $100$ million nonzero entries--in a few minutes on a laptop.
 \end{enumerate}
+
+We note that Martinsson, Rokhlin, and others have developed fast truncated
+SVD and related decomposition methods using randomized methods, see
+for example:
+Edo Liberty, Franco Woolfe, Per-Gunnar Martinsson, Vladimir Rokhlin, and Mark Tygert, Randomized algorithms for the low-rank approximation of matrices, Proceedings of the National Academy of Sciences 2007 104: 20167-20172.
+These methods are indeed competetive with the IRLB approach, and problems
+exist where each outperforms the other. 
 
 %% References
 \bibliographystyle{alpha}
