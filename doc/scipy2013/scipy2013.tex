@@ -166,7 +166,8 @@ data-analytic methods and applications including principal component analysis,
 canonical correlation analysis, correspondence analysis, latent semantic
 indexing and non-linear iterative partial least squares to name a few. However,
 numerical implementations of the SVD are intensive, generally incurring a
-computational complexity of $O(m^2n + n^3)$ for an $m \times n$ real matrix.
+computational complexity of $O(m^2n + n^3)$ for an $m \times n$ real matrix
+(when $m\ge n$).
 As a result, data scientist's have fewer analytical tools to understand the
 structure of data as those data become large and the resulting computational
 cost becomes too expensive to carry out.
@@ -175,7 +176,7 @@ cost becomes too expensive to carry out.
 
 Many important analysis methods and applications only require a subset of the
 largest singular values and corresponding singular vectors. With this in mind,
-some numerical analysts have focused on the developement of {\em truncated} SVD
+some numerical analysts have focused on the development of {\em truncated} SVD
 algorithms that calculate the largest or smallest singular values and vectors
 for a matrix.  The {\em augmented implicitly restarted Lanczos
 bidiagonalization} (IRLB) algorithm \cite{Baglama2006} is a fast and efficient
@@ -194,7 +195,7 @@ While IRLB implementations have existed for some time now in both Matlab
 \cite{irlbaMatlab} and R \cite{irlbaR} the scientific Python community has not
 enjoyed the computational savings offered by the algorithm until now.  This
 poster introduces the irlbpy package for Python, a pip-installable open-source
-implementation of the IRLB algorithm that is available from github at
+implementation of the IRLB algorithm that is available from Github at
 https://github.com/bwlewis/irlbpy. The package is compatible with dense and
 sparse data, accepting either numpy 2D arrays or matrices, or scipy sparse
 matrices as input. The rest of this poster gives an overview of the algorithm
@@ -214,14 +215,15 @@ decomposition
 XV = U\Sigma,
 \]
 
-where $V$ is an $n\times p$ orthonormal matrix,
-$U$ is an $m \times p$ orthonormal matrix, $\Sigma$ is an $p \times p$
+where $V$ is an $n\times p$ matrix with orthonormal columns,
+$U$ is an $m \times p$ matrix with orthonormal columns,
+$\Sigma$ is an $p \times p$
 diagonal matrix, and $1\le p\le\min(m,n)$.
 The diagonal values of $\Sigma$ are called singular values of $X$ and
 are nonnegative and ordered,
 $\sigma_1\ge \sigma_2\ge \cdots \sigma_p \geq 0$.
 The columns of $U$ and $V$ are
-called the left and right signular vectors, repsectively.
+called the left and right singular vectors, respectively.
 
 \vspace{0.75cm}
 
@@ -249,7 +251,9 @@ their corresponding vectors, even for large problems.
 
 In practice the IRLB algorithm scales linearly in the size of the data.
 This gives it a tremendous advantage over the traditional SVD methods when only
-the largest singular value information is needed.
+the largest singular value information is needed. The IRLB algorithm is
+particularly well-suited to problems when $m$ and $n$ are not too different.
+Such problems are often the most computationally challenging ones.
 
 \vspace{0.75cm}
 
@@ -258,7 +262,7 @@ both dense numpy matrices and sparse scipy matrices.
 
 \vspace{0.75cm}
 
-A distributed version of the IRLB algorithm is availablle
+A distributed version of the IRLB algorithm is available
 for SciDB \cite{scidb} (and soon indirectly for Python through the
 SciDBPy package under development). This version has computed a truncated SVD
 on sparse matrices with 50 million rows, 40 million columns and
@@ -273,11 +277,10 @@ prize problem--a sparse $500000\times18000$ matrix with about $100$ million nonz
 
 \vspace{0.75cm}
 
-Martinsson, Rokhlin, and others have developed fast truncated
-SVD and related decomposition methods using randomized methods, see
-for example \cite{Liberty2007}
-These methods are indeed competetive with the IRLB approach, and problems
-exist where each outperforms the other. 
+Martinsson, Rokhlin, and others have developed alternative state of the art
+fast truncated SVD and related decomposition methods using randomized methods,
+see for example \cite{Liberty2007}.  These methods are indeed competitive with
+the IRLB approach, and problems exist where each outperforms the other.
 
 %% References
 \bibliographystyle{alpha}
