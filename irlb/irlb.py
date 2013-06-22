@@ -13,8 +13,8 @@ def mult(A,x,t=False):
     m = A.shape[0]
     n = A.shape[1]
     if(t):
-      return(np.array(sp.csr_matrix(x).dot(A).transpose().todense()).reshape(n))
-    return(np.array(A.dot(sp.csr_matrix(x).transpose()).todense()).reshape(m))
+      return(sp.csr_matrix(x).dot(A).transpose().todense().A[:,0])
+    return(A.dot(sp.csr_matrix(x).transpose()).todense().A[:,0])
   if(t):
     return(x.dot(A))
   return(A.dot(x))
