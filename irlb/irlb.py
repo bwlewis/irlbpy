@@ -13,8 +13,8 @@ def mult(A,x,t=False):
     m = A.shape[0]
     n = A.shape[1]
     if(t):
-      return(np.array(sp.csr_matrix(x).dot(A).transpose().todense()).reshape(n))
-    return(np.array(A.dot(sp.csr_matrix(x).transpose()).todense()).reshape(m))
+      return(sp.csr_matrix(x).dot(A).transpose().todense().A[:,0])
+    return(A.dot(sp.csr_matrix(x).transpose()).todense().A[:,0])
   if(t):
     return(x.dot(A))
   return(A.dot(x))
@@ -84,7 +84,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
 
   while(it < maxit):
     if(it>0): j=k
-    W[:,j] = mult(A,V[xrange(0,n),j])
+    W[:,j] = mult(A,V[:,j])
     mprod+=1
     if(it>0):
       W[:,j] = orthog(W[:,j],W[:,0:j]) # NB W[:,0:j] selects columns 0,1,...,j-1
@@ -93,7 +93,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
     W[:,j] = sinv*W[:,j]
     # Lanczos process
     while(j<m_b):
-      F = mult(A,W[xrange(0,m),j],t=True)
+      F = mult(A,W[:,j],t=True)
       mprod+=1
       F = F - s*V[:,j]
       F = orthog(F,V[:,0:j+1])
@@ -104,7 +104,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
         V[:,j+1] = F
         B[j,j] = s
         B[j,j+1] = fn 
-        W[:,j+1] = mult(A,V[xrange(0,n),j+1])
+        W[:,j+1] = mult(A,V[:,j+1])
         mprod+=1
         # One step of classical Gram-Schmidt...
         W[:,j+1] = W[:,j+1] - fn*W[:,j]
