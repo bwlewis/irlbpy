@@ -66,7 +66,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
   n      = A.shape[1]
   if(min(m,n)<2):
     raise Exception("The input matrix must be at least 2x2.")
-  m_b    = min((nu+4, 3*nu, n))  # Working dimension size
+  m_b    = min((nu+20, 3*nu, n))  # Working dimension size
   mprod  = 0
   it     = 0
   j      = 0
