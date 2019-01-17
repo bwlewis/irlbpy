@@ -119,7 +119,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
     # End of Lanczos process
     S    = np.linalg.svd(B)
     R    = fn * S[0][m_b-1,:] # Residuals
-    if(iter<1):
+    if(it<1):
       smax = S[1][0]  # Largest Ritz value
     else:
       smax = max((S[1][0],smax))
