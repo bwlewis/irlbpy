@@ -135,7 +135,7 @@ def irlb(A,n,tol=0.0001,maxit=50):
     V[:,k] = F 
     B = np.zeros((m_b,m_b))
     # Improve this! There must be better way to assign diagonal...
-    for l in xrange(0,k):
+    for l in range(0,k):
       B[l,l] = S[1][l]
     B[0:k,k] = R[0:k]
     # Update the left approximate singular vectors
