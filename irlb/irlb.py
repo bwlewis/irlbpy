@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
 import warnings
-#import pdb
 
 # Matrix-vector product wrapper
 # A is a numpy 2d array or matrix, or a scipy matrix or sparse matrix.
