@@ -3,6 +3,8 @@ import scipy.sparse as sp
 import warnings
 
 
+__all__ = ["irlb"]
+
 def mult(A, x, t=False):
     """Matrix-vector product wrapper
     A is a numpy 2d array or matrix, or a scipy matrix or sparse matrix.
@@ -53,10 +55,21 @@ def irlb(A, n, tol=0.0001, maxit=50):
     Keyword arguments:
     tol   -- An estimation tolerance. Smaller means more accurate estimates.
     maxit -- Maximum number of Lanczos iterations allowed.
-
+    
     Given an input matrix A of dimension j * k, and an input desired number
     of singular values n, the function returns a tuple X with five entries:
 
+    Returns
+    -------
+    irlb : tuple
+        Tuple with 5 items
+            0. A j * nu matrix of estimated left singular vectors.
+            1. A vector of length nu of estimated singular values.
+            2. A k * nu matrix of estimated right singular vectors.
+            3. The number of Lanczos iterations run.
+            4. The number of matrix-vector products run.
+
+    
     X[0] A j * nu matrix of estimated left singular vectors.
     X[1] A vector of length nu of estimated singular values.
     X[2] A k * nu matrix of estimated right singular vectors.
@@ -140,9 +153,12 @@ def irlb(A, n, tol=0.0001, maxit=50):
         V[:, 0:k] = V[:, 0:m_b].dot(S[2].transpose()[:, 0:k])
         V[:, k] = F
         B = np.zeros((m_b, m_b))
+        
         # Improve this! There must be better way to assign diagonal...
-        for l in range(0, k):
-            B[l, l] = S[1][l]
+        #for l in range(0, k):
+        #    B[l, l] = S[1][l]
+        np.fill_diagonal(B, S[1])
+        
         B[0:k, k] = R[0:k]
         # Update the left approximate singular vectors
         W[:, 0:k] = W[:, 0:m_b].dot(S[0][:, 0:k])
