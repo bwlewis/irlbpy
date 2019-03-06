@@ -58,17 +58,6 @@ def irlb(A, n, tol=0.0001, maxit=50):
     
     Given an input matrix A of dimension j * k, and an input desired number
     of singular values n, the function returns a tuple X with five entries:
-
-    Returns
-    -------
-    irlb : tuple
-        Tuple with 5 items
-            0. A j * nu matrix of estimated left singular vectors.
-            1. A vector of length nu of estimated singular values.
-            2. A k * nu matrix of estimated right singular vectors.
-            3. The number of Lanczos iterations run.
-            4. The number of matrix-vector products run.
-
     
     X[0] A j * nu matrix of estimated left singular vectors.
     X[1] A vector of length nu of estimated singular values.
