@@ -4,9 +4,6 @@ import warnings
 from scipy import sparse
 
 
-
-__all__ = ["irlb"]
-
 def mult(A, x, t=False):
     """Matrix-vector product wrapper
     Parameters
