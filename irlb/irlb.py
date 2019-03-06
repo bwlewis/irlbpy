@@ -7,10 +7,21 @@ __all__ = ["irlb"]
 
 def mult(A, x, t=False):
     """Matrix-vector product wrapper
-    A is a numpy 2d array or matrix, or a scipy matrix or sparse matrix.
-    x is a numpy vector only.
-    Compute A.dot(x) if t is False,
-            A.transpose().dot(x)  otherwise.
+    Parameters
+    ----------
+    A : array-like
+        A numpy 2d array or matrix, or a scipy matrix or sparse matrix.
+    x : numpy.array
+        ! dimensional vector
+    t : bool, optional
+        Defalut is False, returns A.dot(x)
+        If True, returns A.transpose().dot(x)
+        
+    Returns
+    -------
+    
+    A.dot(x) if t is False,
+    A.transpose().dot(x) otherwise.
     """
     if sp.issparse(A):
         m = A.shape[0]
@@ -48,25 +59,41 @@ def invcheck(x):
 def irlb(A, n, tol=0.0001, maxit=50):
     """Estimate a few of the largest singular values and corresponding singular
     vectors of matrix using the implicitly restarted Lanczos bidiagonalization
-    method of Baglama and Reichel, see
-    Augmented Implicitly Restarted Lanczos Bidiagonalization Methods,
-    J. Baglama and L. Reichel, SIAM J. Sci. Comput. 2005
-
-    Keyword arguments:
-    tol   -- An estimation tolerance. Smaller means more accurate estimates.
-    maxit -- Maximum number of Lanczos iterations allowed.
+    method of Baglama and Reichel
     
-    Given an input matrix A of dimension j * k, and an input desired number
-    of singular values n, the function returns a tuple X with five entries:
+    Parameters
+    ----------
+    A : numpy array
+        Matrix of dimensions j x k
+        Numeric real or complex-values matrix or real-valued sparse matrix
+    n : int
+        Number of singular values to estimate
+    tol : float, optional
+        An estimation tolerance, smaller means more accurate estimates.
+        Default is 0.0001
+    maxit : int, optional
+        Maximum number of Lanczos iterations allowed
     
-    X[0] A j * nu matrix of estimated left singular vectors.
-    X[1] A vector of length nu of estimated singular values.
-    X[2] A k * nu matrix of estimated right singular vectors.
-    X[3] The number of Lanczos iterations run.
-    X[4] The number of matrix-vector products run.
-
+    Returns
+    -------
+    out : tuple
+        Tuple with 5 items
+        - X[0] A j * nu matrix of estimated left singular vectors.
+        - X[1] A vector of length nu of estimated singular values.
+        - X[2] A k * nu matrix of estimated right singular vectors.
+        - X[3] The number of Lanczos iterations run.
+        - X[4] The number of matrix-vector products run.
+    
+    Notes
+    -----
     The algorithm estimates the truncated singular value decomposition:
-    A.dot(X[2]) = X[0]*X[1].
+    A.dot(X[2]) = X[0] * X[1].
+    
+    References
+    ----------
+    .. [1] : J. Baglama and L. Reichel, "Augmented Implicitly Restarted 
+             Lanczos Bidiagonalization Methods", SIAM J. Sci. Comput. 2005
+             
     """
     nu = n
     m = A.shape[0]
