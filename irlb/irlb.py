@@ -1,6 +1,8 @@
 import numpy as np
-import scipy.sparse as sp
 import warnings
+
+from scipy import sparse
+
 
 
 __all__ = ["irlb"]
@@ -19,16 +21,16 @@ def mult(A, x, t=False):
         
     Returns
     -------
-    
-    A.dot(x) if t is False,
-    A.transpose().dot(x) otherwise.
+    product : float
+        A.dot(x) if t is False,
+        A.transpose().dot(x) otherwise.
     """
-    if sp.issparse(A):
+    if sparse.issparse(A):
         m = A.shape[0]
         n = A.shape[1]
         if t:
-            return sp.csr_matrix(x).dot(A).transpose().todense().A[:, 0]
-        return A.dot(sp.csr_matrix(x).transpose()).todense().A[:, 0]
+            return sparse.csr_matrix(x).dot(A).transpose().todense().A[:, 0]
+        return A.dot(sparse.csr_matrix(x).transpose()).todense().A[:, 0]
     if t:
         return x.dot(A)
     return A.dot(x)
@@ -106,7 +108,7 @@ def irlb(A, n, tol=0.0001, maxit=50):
     j = 0
     k = nu
     smax = 1
-    sparse = sp.issparse(A)
+    spar = sparse.issparse(A)
 
     V = np.zeros((n, m_b))
     W = np.zeros((m, m_b))
