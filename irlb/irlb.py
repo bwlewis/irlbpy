@@ -37,7 +37,7 @@ def invcheck(x):
     warnings.warn("Ill-conditioning encountered, result accuracy may be poor")
   return(x)
 
-def irlb(A,n,tol=0.0001,maxit=50):
+def irlb(A,nu,tol=0.0001,maxit=50):
   """Estimate a few of the largest singular values and corresponding singular
   vectors of matrix using the implicitly restarted Lanczos bidiagonalization
   method of Baglama and Reichel, see:
@@ -61,7 +61,6 @@ def irlb(A,n,tol=0.0001,maxit=50):
   The algorithm estimates the truncated singular value decomposition:
   A.dot(X[2]) = X[0]*X[1].
   """
-  nu     = n
   m      = A.shape[0]
   n      = A.shape[1]
   if(min(m,n)<2):
